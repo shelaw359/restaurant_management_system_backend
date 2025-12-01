@@ -11,6 +11,8 @@ import {
 import { Restaurant } from '../../restaurants/entities/restaurant.entity'; 
 import { TableStatus } from '../../common/enums';
 import { Order } from '../../orders/entities/order.entity'; 
+import { Reservation } from '../../reservations/entities/reservation.entity';
+
 
 @Entity('tables')
 export class Table {
@@ -47,6 +49,9 @@ export class Table {
 
   @OneToMany(() => Order, (order) => order.table)
   orders: Order[];
+
+   @OneToMany(() => Reservation, reservation => reservation.table)
+   reservations: Reservation[];
 
   @CreateDateColumn()
   createdAt: Date;

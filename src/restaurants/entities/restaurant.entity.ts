@@ -12,6 +12,7 @@ import { Category } from '../../categories/entities/category.entity';
 import { Table } from '../../tables/entities/table.entity'; 
 import { Order } from '../../orders/entities/order.entity';
 import { Customer } from '../../customers/entities/customer.entity';
+import { Reservation } from '../../reservations/entities/reservation.entity';
 
 @Entity('restaurants')
 export class Restaurant {
@@ -60,6 +61,10 @@ export class Restaurant {
 
  @OneToMany(() => Customer, (customer) => customer.restaurant)
  customers: Customer[];
+
+  @OneToMany(() => Reservation, reservation => reservation.restaurant)
+  reservations: Reservation[];
+
 
   @CreateDateColumn()
   createdAt: Date;

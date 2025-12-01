@@ -1,76 +1,55 @@
-// src/entities/payment.entity.ts (Complete)
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  ManyToOne,
+  OneToOne,
+  JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
-  JoinColumn,
 } from 'typeorm';
-import { ApiProperty } from '@nestjs/swagger';
-import { PaymentMethod } from '../../common/enums';
-import { PaymentStatus } from '../../common/enums'; 
-import { Order } from '../../orders/entities/order.entity'; 
-
+import { Order } from '../../orders/entities/order.entity';
+import { PaymentMethod, PaymentStatus } from '../../common/enums';
+ 
 @Entity('payments')
 export class Payment {
   @PrimaryGeneratedColumn()
-  @ApiProperty()
   id: number;
 
-  @Column({ type: 'int' })
-  @ApiProperty()
+  @Column({ type: 'int', unique: true })
   orderId: number;
 
   @Column({ type: 'varchar', length: 50, unique: true })
-  @ApiProperty()
   paymentNumber: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
-  @ApiProperty()
   amount: number;
 
-  @Column({
-    type: 'varchar',
-    length: 20,
-    enum: PaymentMethod,
-    default: PaymentMethod.CASH,
-  })
-  @ApiProperty({ enum: PaymentMethod })
+  @Column({ type: 'varchar', length: 50 })
   method: PaymentMethod;
 
   @Column({
     type: 'varchar',
-    length: 20,
-    enum: PaymentStatus,
+    length: 50,
     default: PaymentStatus.PENDING,
   })
-  @ApiProperty({ enum: PaymentStatus })
   status: PaymentStatus;
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
-  @ApiProperty()
+  @Column({ type: 'varchar', length: 255, nullable: true })
   transactionId: string;
 
+  @Column({ type: 'text', nullable: true })
+  notes: string;
+
   @Column({ type: 'datetime', nullable: true })
-  @ApiProperty()
   paidAt: Date;
 
-  @Column({ type: 'text', nullable: true })
-  @ApiProperty()
-  paymentGatewayResponse: string;
+  @OneToOne(() => Order, (order) => order.payments, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'orderId' })
+  order: Order;
 
   @CreateDateColumn()
-  @ApiProperty()
   createdAt: Date;
 
   @UpdateDateColumn()
-  @ApiProperty()
   updatedAt: Date;
-
-  // Relationships
-  @ManyToOne(() => Order, (order) => order.payments)
-  @JoinColumn({ name: 'orderId' })
-  order: Order;
 }

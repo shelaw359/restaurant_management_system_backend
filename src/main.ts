@@ -31,9 +31,9 @@ async function bootstrap() {
     }),
   );
 
-  // Enable CORS
+  // Enable CORS - FIXED
   app.enableCors({
-    origin: process.env.FRONTEND_URL || true,
+    origin: '*', // Changed from 'true' to '*'
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
     credentials: true,
@@ -71,9 +71,9 @@ async function bootstrap() {
   await app.listen(port);
 
   // Success messages
-  logger.log(`🚀 Application running on: http://localhost:${port}`);
-  logger.log(`📚 API Documentation: http://localhost:${port}/api/docs`);
-  logger.log(`💾 Database: ${configService.get('DB_NAME')} @ ${configService.get('DB_HOST')}`);
+  logger.log(` Application running on: http://localhost:${port}`);
+  logger.log(` API Documentation: http://localhost:${port}/api/docs`);
+  logger.log(` Database: ${configService.get('DB_NAME')} @ ${configService.get('DB_HOST')}`);
 }
 
 // Error handling

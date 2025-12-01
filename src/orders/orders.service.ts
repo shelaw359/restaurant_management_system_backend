@@ -1,4 +1,3 @@
-
 import {
   Injectable,
   NotFoundException,
@@ -6,15 +5,14 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
-import { Order } from './entities/order.entity'; 
-import { OrderItem } from './entities/order-item.entity';
-import { MenuItem } from '../../menu-items/entities/menu-item.entity';
-// import { Table } from '../../tables/entities/table.entity'; // commented out - OK if not used
+import { Order } from './entities/order.entity';
+import { OrderItem } from '../order-items/entities/order-item.entity';
+import { MenuItem } from '../menu-items/entities/menu-item.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderStatus, TableStatus } from '../common/enums';
-import { CustomerService } from '../../customers/customers.service'; // Fixed to relative path
-import { TableService } from '../../tables/tables.service'; // Fixed to relative path
+import { CustomerService } from '../customers/customers.service';
+import { TableService } from '../tables/tables.service';
 
 @Injectable()
 export class OrderService {
@@ -37,7 +35,7 @@ export class OrderService {
 
     try {
       // 1. Handle customer (find or create)
-      let customerId = null;
+      let customerId: number | undefined;
       if (createOrderDto.customerPhone) {
         const customer = await this.customerService.findOrCreate({
           phone: createOrderDto.customerPhone,
@@ -50,7 +48,7 @@ export class OrderService {
       // 2. Create order
       const order = this.orderRepository.create({
         restaurantId: createOrderDto.restaurantId,
-        orderNumber: await this.generateOrderNumber(),
+        orderNumber: await this.generateOrderNumber(createOrderDto.restaurantId),
         tableId: createOrderDto.tableId,
         waiterId: createOrderDto.waiterId,
         customerId,
@@ -66,39 +64,17 @@ export class OrderService {
       const savedOrder = await queryRunner.manager.save(order);
 
       // 3. Create order items and calculate totals
-      let subtotal = 0;
+      const orderItems = await this.createOrderItems(
+        savedOrder.id,
+        createOrderDto.items,
+        queryRunner,
+      );
 
-      for (const itemDto of createOrderDto.items) {
-        const menuItem = await this.menuItemRepository.findOne({
-          where: { id: itemDto.menuItemId },
-        });
-
-        if (!menuItem) {
-          throw new NotFoundException(`Menu item #${itemDto.menuItemId} not found`);
-        }
-
-        if (!menuItem.isAvailable) {
-          throw new BadRequestException(`${menuItem.name} is currently unavailable`);
-        }
-
-        const totalPrice = Number(menuItem.price) * itemDto.quantity;
-
-        const orderItem = this.orderItemRepository.create({
-          orderId: savedOrder.id,
-          menuItemId: menuItem.id,
-          quantity: itemDto.quantity,
-          unitPrice: menuItem.price,
-          totalPrice,
-          specialInstructions: itemDto.specialInstructions,
-        });
-
-        await queryRunner.manager.save(orderItem);
-        subtotal += totalPrice;
-      }
+      const subtotal = orderItems.reduce((sum, item) => sum + item.totalPrice, 0);
 
       // 4. Update order totals
       savedOrder.subtotal = subtotal;
-      savedOrder.total = subtotal; // No discount initially
+      savedOrder.total = subtotal;
       await queryRunner.manager.save(savedOrder);
 
       // 5. Occupy table if dine-in
@@ -236,7 +212,7 @@ export class OrderService {
     order.status = OrderStatus.CANCELLED;
 
     // Release table if occupied
-    if (order.tableId && order.table.status === TableStatus.OCCUPIED) {
+    if (order.tableId && order.table?.status === TableStatus.OCCUPIED) {
       await this.tableService.releaseTable(order.tableId);
     }
 
@@ -262,24 +238,70 @@ export class OrderService {
       (order) => order.createdAt >= startOfDay && order.createdAt <= endOfDay,
     );
 
+    const totalSales = dailyOrders.reduce((sum, order) => sum + Number(order.total), 0);
+
     return {
       date: date.toISOString().split('T')[0],
       totalOrders: dailyOrders.length,
-      totalSales: dailyOrders.reduce((sum, order) => sum + Number(order.total), 0),
-      averageOrderValue:
-        dailyOrders.length > 0
-          ? dailyOrders.reduce((sum, order) => sum + Number(order.total), 0) /
-            dailyOrders.length
-          : 0,
+      totalSales,
+      averageOrderValue: dailyOrders.length > 0 ? totalSales / dailyOrders.length : 0,
     };
   }
 
-  private async generateOrderNumber(): Promise<string> {
+  // Private helper methods
+  private async createOrderItems(
+    orderId: number,
+    items: any[],
+    queryRunner: any,
+  ): Promise<OrderItem[]> {
+    const orderItems: OrderItem[] = [];
+
+    for (const itemDto of items) {
+      const menuItem = await this.menuItemRepository.findOne({
+        where: { id: itemDto.menuItemId },
+      });
+
+      if (!menuItem) {
+        throw new NotFoundException(`Menu item #${itemDto.menuItemId} not found`);
+      }
+
+      if (!menuItem.isAvailable) {
+        throw new BadRequestException(`${menuItem.name} is currently unavailable`);
+      }
+
+      const totalPrice = Number(menuItem.price) * itemDto.quantity;
+
+      const orderItem = this.orderItemRepository.create({
+        order: { id: orderId } as Order,
+        menuItem: { id: menuItem.id } as MenuItem,
+        quantity: itemDto.quantity,
+        unitPrice: menuItem.price,
+        totalPrice,
+        specialInstructions: itemDto.specialInstructions,
+      });
+
+      const savedItem = await queryRunner.manager.save(orderItem);
+      orderItems.push(savedItem);
+    }
+
+    return orderItems;
+  }
+
+  private async generateOrderNumber(restaurantId: number): Promise<string> {
     const date = new Date();
     const dateStr = date.toISOString().split('T')[0].replace(/-/g, '');
-    const random = Math.floor(Math.random() * 1000)
-      .toString()
-      .padStart(3, '0');
-    return `ORD-${dateStr}-${random}`;
+    
+    // Get count of orders today for this restaurant to ensure uniqueness
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+    
+    const todayOrdersCount = await this.orderRepository.count({
+      where: {
+        restaurantId,
+      },
+    });
+    
+    const sequence = (todayOrdersCount + 1).toString().padStart(4, '0');
+    return `ORD-${dateStr}-${sequence}`;
   }
 }
