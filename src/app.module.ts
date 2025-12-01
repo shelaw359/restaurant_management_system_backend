@@ -10,7 +10,7 @@ import { OrderModule } from './orders/orders.module';
 import { OrderItemModule } from './order-items/order-items.module';
 import { PaymentModule } from './payments/payments.module';
 import { ReservationModule } from './reservations/reservations.module';
-import { InventoryItemsModule } from './inventory-items/inventory-items.module';
+import { InventoryModule } from './inventory-items/inventory-items.module';
 import { CustomerModule } from './customers/customers.module';
 
 @Module({
@@ -55,7 +55,7 @@ import { CustomerModule } from './customers/customers.module';
     OrderItemModule,
     PaymentModule,
     ReservationModule,
-    InventoryItemsModule,
+    InventoryModule,
     CustomerModule,
   ],
 })
