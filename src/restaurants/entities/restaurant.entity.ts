@@ -13,6 +13,7 @@ import { Table } from '../../tables/entities/table.entity';
 import { Order } from '../../orders/entities/order.entity';
 import { Customer } from '../../customers/entities/customer.entity';
 import { Reservation } from '../../reservations/entities/reservation.entity';
+import { InventoryItem } from '../../inventory-items/entities/inventory-item.entity';
 
 @Entity('restaurants')
 export class Restaurant {
@@ -64,6 +65,9 @@ export class Restaurant {
 
   @OneToMany(() => Reservation, reservation => reservation.restaurant)
   reservations: Reservation[];
+
+  @OneToMany(() => InventoryItem, (item) => item.restaurant)
+  inventoryItems: InventoryItem[];
 
 
   @CreateDateColumn()
