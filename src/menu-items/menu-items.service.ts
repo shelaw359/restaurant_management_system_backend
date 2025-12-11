@@ -6,7 +6,7 @@ import { CreateMenuItemDto } from './dto/create-menu-item.dto';
 import { UpdateMenuItemDto } from './dto/update-menu-item.dto';
 
 @Injectable()
-export class MenuService {
+export class MenuItemService {  // CHANGED FROM MenuService to MenuItemService
   constructor(
     @InjectRepository(MenuItem)
     private menuItemRepository: Repository<MenuItem>,
@@ -25,9 +25,13 @@ export class MenuService {
     });
   }
 
-  async findByCategory(categoryId: number): Promise<MenuItem[]> {
+  async findByCategory(restaurantId: number, categoryId: number): Promise<MenuItem[]> {
     return await this.menuItemRepository.find({
-      where: { categoryId, isAvailable: true },
+      where: { 
+        restaurantId, 
+        categoryId, 
+        isAvailable: true 
+      },
       order: { displayOrder: 'ASC', name: 'ASC' },
     });
   }

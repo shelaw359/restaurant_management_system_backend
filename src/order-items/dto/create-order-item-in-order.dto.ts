@@ -2,8 +2,8 @@ import { IsInt, IsString, IsOptional, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
-export class CreateOrderItemDto {
-  @ApiProperty({ example: 1 })
+export class CreateOrderItemInOrderDto {
+  @ApiProperty({ example: 5 })
   @IsInt()
   @Type(() => Number)
   menuItemId: number;
@@ -14,8 +14,9 @@ export class CreateOrderItemDto {
   @Type(() => Number)
   quantity: number;
 
-  @ApiProperty({ example: 'No onions', required: false })
+  @ApiProperty({ example: 'No onions, extra cheese', required: false })
   @IsOptional()
   @IsString()
   specialInstructions?: string;
+  // NO orderId here - this is for creating with order
 }

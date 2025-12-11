@@ -1,0 +1,460 @@
+### 1. SETUP FIRST ADMIN (ONE-TIME OPERATION)
+### This will create both restaurant and admin user
+POST http://localhost:4000/auth/setup-admin
+Content-Type: application/json
+
+{
+  "restaurantName": "Golden Dragon Restaurant",
+  "restaurantPhone": "+254712345678",
+  "restaurantEmail": "info@goldendragon.co.ke",
+  "restaurantAddress": "123 Utawala, Nairobi, Kenya",
+  "name": "System Administrator",
+  "email": "admin@goldendragon.com",
+  "phone": "+254712345678",
+  "password": "Admin@2024"
+}
+
+### 2. LOGIN WITH CREATED ADMIN
+POST http://localhost:4000/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@goldendragon.com",
+  "password": "Admin@2024"
+}
+
+###
+GET http://localhost:4000/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5AZ29sZGVuZHJhZ29uLmNvbSIsInJvbGUiOiJBRE1JTiIsInJlc3RhdXJhbnRJZCI6MSwiaWF0IjoxNzY0Nzk0MTY4LCJleHAiOjE3NjQ3OTUwNjh9.dkLUU5Tkknf6ZH3Ur2x_Y9C0Wp01TnXAYOKutfjwNe4
+
+### 
+GET http://localhost:4000/auth/debug-jwt
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5AZ29sZGVuZHJhZ29uLmNvbSIsInJvbGUiOiJBRE1JTiIsInJlc3RhdXJhbnRJZCI6MSwiaWF0IjoxNzY0Nzk0MTY4LCJleHAiOjE3NjQ3OTUwNjh9.dkLUU5Tkknf6ZH3Ur2x_Y9C0Wp01TnXAYOKutfjwNe4
+
+### Create Waiter
+POST http://localhost:4000/auth/staff
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5AZ29sZGVuZHJhZ29uLmNvbSIsInJvbGUiOiJBRE1JTiIsInJlc3RhdXJhbnRJZCI6MSwiaWF0IjoxNzY0NjcyMDIyLCJleHAiOjE3NjUyNzY4MjJ9.foFpsvWjDgN7NdSxWxKowCKf57Cy9xrHVWGoZqnVKdw
+Content-Type: application/json
+
+{
+  "name": "John Waiter",
+  "email": "waiter@goldendragon.com",
+  "password": "Waiter@2024",
+  "role": "WAITER",
+  "phone": "+254723456789"
+}
+
+### Create Chef
+POST http://localhost:4000/auth/staff
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5AZ29sZGVuZHJhZ29uLmNvbSIsInJvbGUiOiJBRE1JTiIsInJlc3RhdXJhbnRJZCI6MSwiaWF0IjoxNzY0NjcyMDIyLCJleHAiOjE3NjUyNzY4MjJ9.foFpsvWjDgN7NdSxWxKowCKf57Cy9xrHVWGoZqnVKdw
+Content-Type: application/json
+
+{
+  "name": "Master Chef",
+  "email": "chef@goldendragon.com",
+  "password": "Chef@2024",
+  "role": "CHEF",
+  "phone": "+254734567890"
+}
+
+### Create Manager
+POST http://localhost:4000/auth/staff
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5AZ29sZGVuZHJhZ29uLmNvbSIsInJvbGUiOiJBRE1JTiIsInJlc3RhdXJhbnRJZCI6MSwiaWF0IjoxNzY0NjcyMDIyLCJleHAiOjE3NjUyNzY4MjJ9.foFpsvWjDgN7NdSxWxKowCKf57Cy9xrHVWGoZqnVKdw
+Content-Type: application/json
+
+{
+  "name": "Restaurant Manager",
+  "email": "manager@goldendragon.com",
+  "password": "Manager@2024",
+  "role": "MANAGER",
+  "phone": "+254745678901"
+}
+
+###
+GET http://localhost:4000/auth/staff
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5AZ29sZGVuZHJhZ29uLmNvbSIsInJvbGUiOiJBRE1JTiIsInJlc3RhdXJhbnRJZCI6MSwiaWF0IjoxNzY0Nzk0MTY4LCJleHAiOjE3NjQ3OTUwNjh9.dkLUU5Tkknf6ZH3Ur2x_Y9C0Wp01TnXAYOKutfjwNe4
+
+@host = http://localhost:4000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5AZ29sZGVuZHJhZ29uLmNvbSIsInJvbGUiOiJBRE1JTiIsInJlc3RhdXJhbnRJZCI6MSwiaWF0IjoxNzY0NjcyMDIyLCJleHAiOjE3NjUyNzY4MjJ9.foFpsvWjDgN7NdSxWxKowCKf57Cy9xrHVWGoZqnVKdw
+@contentType = application/json
+
+### ========== RESTAURANT MODULE ==========
+### 3. Get Restaurant Info
+GET {{host}}/restaurant
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5AZ29sZGVuZHJhZ29uLmNvbSIsInJvbGUiOiJBRE1JTiIsInJlc3RhdXJhbnRJZCI6MSwiaWF0IjoxNzY0Nzk0MTY4LCJleHAiOjE3NjQ3OTUwNjh9.dkLUU5Tkknf6ZH3Ur2x_Y9C0Wp01TnXAYOKutfjwNe4
+
+### 4. Update Restaurant Info
+PATCH {{host}}/restaurant/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5AZ29sZGVuZHJhZ29uLmNvbSIsInJvbGUiOiJBRE1JTiIsInJlc3RhdXJhbnRJZCI6MSwiaWF0IjoxNzY1MjIyMDYyLCJleHAiOjE3NjUyMjI5NjJ9.QrinFH16XdEAEI5UAiTJKD8OgAJlkMsIvUIJqq55ORQ
+Content-Type: {{contentType}}
+
+{
+  "name": "MODERN SHELTON RESTAURANT",
+  "phone": "+254746244597",
+  "address": "324, EMBU-MERU HIGHWAY, KENYA",
+  "email": "contact@mordernrestaurant.co.ke",
+  "openingTime": "6:00 AM",
+  "closingTime": "10:00 PM"
+}
+
+### ========== TABLES MODULE ==========
+### 5. Create Table
+POST {{host}}/tables
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5AZ29sZGVuZHJhZ29uLmNvbSIsInJvbGUiOiJBRE1JTiIsInJlc3RhdXJhbnRJZCI6MSwiaWF0IjoxNzY0Nzk0MTY4LCJleHAiOjE3NjQ3OTUwNjh9.dkLUU5Tkknf6ZH3Ur2x_Y9C0Wp01TnXAYOKutfjwNe4
+Content-Type: {{contentType}}
+
+{
+  "tableNumber": "T01",
+  "capacity": 4,
+  "status": "AVAILABLE",
+  "location": "Main Hall",
+  "description": "Window side table"
+}
+
+### 6. Create More Tables
+POST {{host}}/tables
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "tableNumber": "T02",
+  "capacity": 6,
+  "status": "AVAILABLE",
+  "location": "Main Hall"
+}
+
+###
+POST {{host}}/tables
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "tableNumber": "T03",
+  "capacity": 2,
+  "status": "AVAILABLE",
+  "location": "Garden",
+  "description": "Romantic table for two"
+}
+
+### 7. Get All Tables
+GET {{host}}/tables
+Authorization: Bearer {{token}}
+
+### 8. Get Available Tables
+GET {{host}}/tables/available
+Authorization: Bearer {{token}}
+
+### ========== CATEGORIES MODULE ==========
+### 9. Create Appetizers Category
+POST {{host}}/categories
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "name": "Appetizers",
+  "description": "Starters and small dishes"
+}
+
+### 10. Create Main Course Category
+POST {{host}}/categories
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "name": "Main Course",
+  "description": "Main dishes and entrees"
+}
+
+### 11. Create Drinks Category
+POST {{host}}/categories
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "name": "Drinks",
+  "description": "Beverages and drinks"
+}
+
+### 12. Get All Categories
+GET {{host}}/categories
+Authorization: Bearer {{token}}
+
+### ========== MENU ITEMS MODULE ==========
+POST {{host}}/menu
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5AZ29sZGVuZHJhZ29uLmNvbSIsInJvbGUiOiJBRE1JTiIsInJlc3RhdXJhbnRJZCI6MSwiaWF0IjoxNzY0Nzk0MTY4LCJleHAiOjE3NjQ3OTUwNjh9.dkLUU5Tkknf6ZH3Ur2x_Y9C0Wp01TnXAYOKutfjwNe4
+Content-Type: application/json
+
+{
+  "name": "Spring Rolls",
+  "description": "Crispy vegetable spring rolls with sweet chili sauce",
+  "price": 850,
+  "categoryId": 1,
+  "restaurantId": 1,
+  "prepTime": 15
+}
+
+### 14. Create Chicken Curry (Main Course)
+POST {{host}}/menu
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "name": "Chicken Curry",
+  "description": "Spicy chicken curry with rice",
+  "price": 15.99,
+  "categoryId": 2,
+  "isAvailable": true,
+  "preparationTime": 25
+}
+
+### 15. Create Orange Juice (Drink)
+POST {{host}}/menu
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "name": "Fresh Orange Juice",
+  "description": "Freshly squeezed orange juice",
+  "price": 4.99,
+  "categoryId": 3,
+  "isAvailable": true,
+  "preparationTime": 5
+}
+
+### 16. Get All Menu Items
+GET {{host}}/menu
+Authorization: Bearer {{token}}
+
+### 17. Get Menu Items by Category
+GET {{host}}/menu/category/1
+Authorization: Bearer {{token}}
+
+### ========== CUSTOMERS MODULE ==========
+### 18. Create Customer
+POST {{host}}/customers
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "name": "John Doe",
+  "phone": "+254712345600",
+  "email": "john.doe@example.com"
+}
+
+### 19. Create or Find Customer by Phone
+POST {{host}}/customers/find-or-create
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "name": "Jane Smith",
+  "phone": "+254712345601"
+}
+
+### 20. Get All Customers
+GET {{host}}/customers
+Authorization: Bearer {{token}}
+
+### 21. Create Order
+POST {{host}}/orders
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5AZ29sZGVuZHJhZ29uLmNvbSIsInJvbGUiOiJBRE1JTiIsInJlc3RhdXJhbnRJZCI6MSwiaWF0IjoxNzY0OTIyNzI1LCJleHAiOjE3NjQ5MjM2MjV9.HgyhVDp8J-hOikSiGKj_4qDpkSgHU9qFBMCT1eA-VnQ
+Content-Type: application/json
+
+{
+  "customerId": 1,
+  "waiterId": 2,
+  "orderType": "DINE_IN",
+  "notes": "Table by the window",
+  "items": [
+    {
+      "menuItemId": 1,
+      "quantity": 2,
+      "specialInstructions": "Extra sweet chili sauce"
+    },
+    {
+      "menuItemId": 3,
+      "quantity": 1,
+      "specialInstructions": "No ice"
+    }
+  ]
+}
+
+### Check if customer exists
+GET {{host}}/customers/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5AZ29sZGVuZHJhZ29uLmNvbSIsInJvbGUiOiJBRE1JTiIsInJlc3RhdXJhbnRJZCI6MSwiaWF0IjoxNzY0OTIyNzI1LCJleHAiOjE3NjQ5MjM2MjV9.HgyhVDp8J-hOikSiGKj_4qDpkSgHU9qFBMCT1eA-VnQ
+
+### Get all menu items
+GET {{host}}/menu
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5AZ29sZGVuZHJhZ29uLmNvbSIsInJvbGUiOiJBRE1JTiIsInJlc3RhdXJhbnRJZCI6MSwiaWF0IjoxNzY0OTIyNzI1LCJleHAiOjE3NjQ5MjM2MjV9.HgyhVDp8J-hOikSiGKj_4qDpkSgHU9qFBMCT1eA-VnQ
+
+### Get all staff
+GET {{host}}/auth/staff
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5AZ29sZGVuZHJhZ29uLmNvbSIsInJvbGUiOiJBRE1JTiIsInJlc3RhdXJhbnRJZCI6MSwiaWF0IjoxNzY0OTIyNzI1LCJleHAiOjE3NjQ5MjM2MjV9.HgyhVDp8J-hOikSiGKj_4qDpkSgHU9qFBMCT1eA-VnQ
+
+### Create TAKEAWAY order
+POST {{host}}/orders
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5AZ29sZGVuZHJhZ29uLmNvbSIsInJvbGUiOiJBRE1JTiIsInJlc3RhdXJhbnRJZCI6MSwiaWF0IjoxNzY0OTIzOTQ4LCJleHAiOjE3NjQ5MjQ4NDh9.lYLK_I80OiPRNd0W8cLYfDpWxIUl0b2JD3-gS9gaL9s
+Content-Type: application/json
+
+{
+  "customerId": 1,
+  "orderType": "TAKEAWAY",
+  "notes": "Takeaway order",
+  "items": [
+    {
+      "menuItemId": 2,
+      "quantity": 1
+    }
+  ]
+}
+
+### Get all staff to see waiter IDs
+GET {{host}}/auth/staff
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5AZ29sZGVuZHJhZ29uLmNvbSIsInJvbGUiOiJBRE1JTiIsInJlc3RhdXJhbnRJZCI6MSwiaWF0IjoxNzY0OTIzOTQ4LCJleHAiOjE3NjQ5MjQ4NDh9.lYLK_I80OiPRNd0W8cLYfDpWxIUl0b2JD3-gS9gaL9s
+
+### Create order with waiterId 2 (John Waiter)
+POST {{host}}/orders
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5AZ29sZGVuZHJhZ29uLmNvbSIsInJvbGUiOiJBRE1JTiIsInJlc3RhdXJhbnRJZCI6MSwiaWF0IjoxNzY0OTIzOTQ4LCJleHAiOjE3NjQ5MjQ4NDh9.lYLK_I80OiPRNd0W8cLYfDpWxIUl0b2JD3-gS9gaL9s
+Content-Type: application/json
+
+{
+  "customerId": 1,
+  "waiterId": 2,
+  "orderType": "TAKEAWAY",
+  "notes": "Takeaway order",
+  "items": [
+    {
+      "menuItemId": 2,
+      "quantity": 1
+    }
+  ]
+}
+
+### 1. First test if your token is still valid
+GET {{host}}/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5AZ29sZGVuZHJhZ29uLmNvbSIsInJvbGUiOiJBRE1JTiIsInJlc3RhdXJhbnRJZCI6MSwiaWF0IjoxNzY0OTI1MDQ2LCJleHAiOjE3NjQ5MjU5NDZ9.2XJvUUTyM2j8YE9UzyntmBBh7WXC_AtXULfd7b9UAMw
+
+### 2. Check if orders endpoint is accessible
+GET {{host}}/orders
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5AZ29sZGVuZHJhZ29uLmNvbSIsInJvbGUiOiJBRE1JTiIsInJlc3RhdXJhbnRJZCI6MSwiaWF0IjoxNzY0OTI1MDQ2LCJleHAiOjE3NjQ5MjU5NDZ9.2XJvUUTyM2j8YE9UzyntmBBh7WXC_AtXULfd7b9UAMw
+
+### 3. Check if menu item 2 still exists
+GET {{host}}/menu/2
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5AZ29sZGVuZHJhZ29uLmNvbSIsInJvbGUiOiJBRE1JTiIsInJlc3RhdXJhbnRJZCI6MSwiaWF0IjoxNzY0OTI1MDQ2LCJleHAiOjE3NjQ5MjU5NDZ9.2XJvUUTyM2j8YE9UzyntmBBh7WXC_AtXULfd7b9UAMw
+
+### Create order with FRESH token
+POST {{host}}/orders
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5AZ29sZGVuZHJhZ29uLmNvbSIsInJvbGUiOiJBRE1JTiIsInJlc3RhdXJhbnRJZCI6MSwiaWF0IjoxNzY0OTI1NDM5LCJleHAiOjE3NjQ5MjYzMzl9.wAMr3cO1h5UWph1QBfwgGLJIXUdLfcgaghUH4izymRo
+Content-Type: application/json
+
+{
+  "orderType": "TAKEAWAY",
+  "items": [
+    {
+      "menuItemId": 2,
+      "quantity": 1
+    }
+  ]
+}
+
+###
+GET {{host}}/orders
+Authorization: Bearer {{token}}
+
+### 23. Get Pending Orders
+GET {{host}}/orders/status/PENDING
+Authorization: Bearer {{token}}
+
+### ========== ORDER STATUS UPDATES ==========
+### 24. Update Order Status (Chef marks as preparing)
+PATCH {{host}}/orders/1/status
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "status": "PREPARING"
+}
+
+### 25. Update Order Status (Chef marks as ready)
+PATCH {{host}}/orders/1/status
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "status": "READY"
+}
+
+### 26. Update Order Status (Waiter marks as served)
+PATCH {{host}}/orders/1/status
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "status": "SERVED"
+}
+
+### ========== PAYMENTS MODULE ==========
+### 27. Process Payment for Order
+POST {{host}}/payments/process/1
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "amount": 22.97,
+  "paymentMethod": "CASH",
+  "notes": "Paid in full"
+}
+
+### 28. Get All Payments
+GET {{host}}/payments
+Authorization: Bearer {{token}}
+
+### ========== INVENTORY MODULE ==========
+### 29. Add Inventory Item
+POST {{host}}/inventory
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "name": "Chicken Breast",
+  "category": "MEAT",
+  "quantity": 50,
+  "unit": "kg",
+  "minimumStock": 10,
+  "supplier": "Fresh Farms Ltd"
+}
+
+### 30. Get Low Stock Items
+GET {{host}}/inventory/low-stock
+Authorization: Bearer {{token}}
+
+### ========== RESERVATIONS MODULE ==========
+### 31. Create Reservation
+POST {{host}}/reservations
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "customerId": 1,
+  "tableId": 1,
+  "reservationDate": "2025-12-03T19:00:00.000Z",
+  "numberOfGuests": 4,
+  "notes": "Anniversary celebration"
+}
+
+### 32. Get Upcoming Reservations
+GET {{host}}/reservations/upcoming
+Authorization: Bearer {{token}}
+
+### ========== REPORTS & ANALYTICS ==========
+### 33. Get Daily Sales Report
+GET {{host}}/orders/sales/daily?date=2025-12-02
+Authorization: Bearer {{token}}
+
+### 34. Get Daily Revenue
+GET {{host}}/payments/revenue/daily?date=2025-12-02
+Authorization: Bearer {{token}}
+
+### 35. Get Restaurant Statistics
+GET {{host}}/restaurant/statistics
+Authorization: Bearer {{token}}

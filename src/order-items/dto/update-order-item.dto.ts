@@ -1,17 +1,4 @@
-import { IsInt, IsString, IsOptional, Min } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { PartialType } from '@nestjs/swagger';
+import { CreateOrderItemDto } from './create-order-item.dto';
 
-export class UpdateOrderItemDto {
-  @ApiProperty({ example: 3, required: false })
-  @IsOptional()
-  @IsInt()
-  @Min(1)
-  @Type(() => Number)
-  quantity?: number;
-
-  @ApiProperty({ example: 'Extra spicy', required: false })
-  @IsOptional()
-  @IsString()
-  specialInstructions?: string;
-}
+export class UpdateOrderItemDto extends PartialType(CreateOrderItemDto) {}

@@ -5,13 +5,14 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Payment } from './entities/payment.entity';
 import { Order } from '../orders/entities/order.entity';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { ProcessPaymentDto } from './dto/process-payment.dto';
 import { PaymentStatus, OrderStatus } from '../common/enums/index';
+
 @Injectable()
 export class PaymentService {
   constructor(
@@ -47,7 +48,7 @@ export class PaymentService {
       );
     }
 
-    // 4. Create payment
+    // 4. Create payment - allow status from DTO or default to PENDING
     const payment = this.paymentRepository.create({
       orderId: createPaymentDto.orderId,
       paymentNumber: await this.generatePaymentNumber(),
@@ -55,7 +56,7 @@ export class PaymentService {
       method: createPaymentDto.method,
       transactionId: createPaymentDto.transactionId,
       notes: createPaymentDto.notes,
-      status: PaymentStatus.PENDING,
+      status: createPaymentDto.status || PaymentStatus.PENDING,
     });
 
     return await this.paymentRepository.save(payment);
@@ -73,7 +74,7 @@ export class PaymentService {
     }
 
     // 2. Check if payment exists or create it
-    let payment = order.payments?.[0] || null;
+    let payment = order.payment || null;
 
     if (!payment) {
       payment = this.paymentRepository.create({
@@ -97,10 +98,12 @@ export class PaymentService {
 
     const savedPayment = await this.paymentRepository.save(payment);
 
-    // 3. Update order status to completed
-    order.status = OrderStatus.COMPLETED;
-    order.completedAt = new Date();
-    await this.orderRepository.save(order);
+    // ✅ Update order status to PAID
+    if (order.status !== OrderStatus.PAID) {
+      order.status = OrderStatus.PAID;
+      order.completedAt = new Date();
+      await this.orderRepository.save(order);
+    }
 
     return await this.findOne(savedPayment.id);
   }
@@ -267,6 +270,22 @@ export class PaymentService {
         return acc;
       }, {} as Record<string, { count: number; amount: number }>),
     };
+  }
+
+  async updatePaymentStatus(orderId: number, status: PaymentStatus): Promise<Payment> {
+    const payment = await this.findByOrder(orderId);
+    
+    if (!payment) {
+      throw new NotFoundException(`Payment for order #${orderId} not found`);
+    }
+
+    payment.status = status;
+    
+    if (status === PaymentStatus.COMPLETED) {
+      payment.paidAt = new Date();
+    }
+
+    return await this.paymentRepository.save(payment);
   }
 
   private async generatePaymentNumber(): Promise<string> {

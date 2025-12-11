@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AppController } from './app.controller';  // ⬅️ ADD THIS
+import { AppService } from './app.service';        // ⬅️ ADD THIS
 import { AuthModule } from './auth/auth.module'; 
 import { RestaurantModule } from './restaurants/restaurants.module'; 
 import { CategoryModule } from './categories/categories.module'; 
@@ -32,9 +34,9 @@ import { CustomerModule } from './customers/customers.module';
           password: configService.get('DB_PASSWORD'),
           database: configService.get('DB_NAME'),
           entities: [__dirname + '/**/*.entity{.ts,.js}'],
-          synchronize: isDevelopment, // Auto-create tables in dev
-          logging: isDevelopment, // Show SQL logs in dev
-          logger: 'advanced-console', // Better logs
+          synchronize: isDevelopment,
+          logging: isDevelopment,
+          logger: 'advanced-console',
           options: {
             encrypt: false,
             trustServerCertificate: true,
@@ -58,5 +60,7 @@ import { CustomerModule } from './customers/customers.module';
     InventoryModule,
     CustomerModule,
   ],
+  controllers: [AppController],  // ⬅️ ADD THIS LINE
+  providers: [AppService],       // ⬅️ ADD THIS LINE
 })
 export class AppModule {}

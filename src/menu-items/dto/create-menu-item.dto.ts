@@ -1,10 +1,10 @@
 import {
   IsString,
   IsInt,
-  IsDecimal,
   IsOptional,
   IsBoolean,
   Min,
+  IsNumber,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
@@ -20,6 +20,7 @@ export class CreateMenuItemDto {
   description?: string;
 
   @ApiProperty({ example: 850 })
+  @IsNumber()
   @Type(() => Number)
   price: number;
 
@@ -33,6 +34,12 @@ export class CreateMenuItemDto {
   @Type(() => Number)
   restaurantId: number;
 
+  @ApiProperty({ example: true, required: false, default: true })
+  @IsOptional()
+  @IsBoolean()
+  @Type(() => Boolean)
+  isAvailable?: boolean;
+
   @ApiProperty({ example: 15, required: false })
   @IsOptional()
   @IsInt()
@@ -43,6 +50,7 @@ export class CreateMenuItemDto {
   @ApiProperty({ example: false, required: false })
   @IsOptional()
   @IsBoolean()
+  @Type(() => Boolean)
   isPopular?: boolean;
 
   @ApiProperty({ example: 1, required: false })

@@ -8,51 +8,68 @@ import {
   Delete,
   UseGuards,
   ParseIntPipe,
-  Query,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
-import { MenuService } from './menu-items.service'; 
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { MenuItemService } from './menu-items.service'; // CHANGED TO MenuItemService
 import { CreateMenuItemDto } from './dto/create-menu-item.dto';
 import { UpdateMenuItemDto } from './dto/update-menu-item.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../common/enums';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { User } from '../users/entities/user.entity';
 
 @ApiTags('Menu Items')
 @Controller('menu')
-@UseGuards(JwtAuthGuard, RolesGuard)
-@ApiBearerAuth()
 export class MenuController {
-  constructor(private readonly menuService: MenuService) {}
+  constructor(private readonly menuService: MenuItemService) {} // CHANGED TYPE
 
   @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
   @Roles(UserRole.ADMIN, UserRole.OWNER, UserRole.MANAGER)
   @ApiOperation({ summary: 'Create menu item (ADMIN/OWNER/MANAGER)' })
-  create(@Body() createMenuItemDto: CreateMenuItemDto) {
-    return this.menuService.create(createMenuItemDto);
+  create(
+    @CurrentUser() user: User,
+    @Body() createMenuItemDto: CreateMenuItemDto,
+  ) {
+    return this.menuService.create({
+      ...createMenuItemDto,
+      restaurantId: user.restaurantId,
+    });
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all menu items for a restaurant' })
-  @ApiQuery({ name: 'restaurantId', type: Number })
-  findAll(@Query('restaurantId', ParseIntPipe) restaurantId: number) {
-    return this.menuService.findAll(restaurantId);
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get all menu items for current restaurant' })
+  findAll(@CurrentUser() user: User) {
+    return this.menuService.findAll(user.restaurantId);
   }
 
   @Get('category/:categoryId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get menu items by category' })
-  findByCategory(@Param('categoryId', ParseIntPipe) categoryId: number) {
-    return this.menuService.findByCategory(categoryId);
+  findByCategory(
+    @CurrentUser() user: User,
+    @Param('categoryId', ParseIntPipe) categoryId: number,
+  ) {
+    return this.menuService.findByCategory(user.restaurantId, categoryId);
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get menu item by ID' })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.menuService.findOne(id);
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
   @Roles(UserRole.ADMIN, UserRole.OWNER, UserRole.MANAGER)
   @ApiOperation({ summary: 'Update menu item (ADMIN/OWNER/MANAGER)' })
   update(
@@ -63,6 +80,8 @@ export class MenuController {
   }
 
   @Patch(':id/toggle')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
   @Roles(UserRole.ADMIN, UserRole.OWNER, UserRole.MANAGER)
   @ApiOperation({ summary: 'Toggle menu item availability' })
   toggleAvailability(@Param('id', ParseIntPipe) id: number) {
@@ -70,6 +89,8 @@ export class MenuController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
   @Roles(UserRole.ADMIN, UserRole.OWNER, UserRole.MANAGER)
   @ApiOperation({ summary: 'Delete menu item (ADMIN/OWNER/MANAGER)' })
   remove(@Param('id', ParseIntPipe) id: number) {

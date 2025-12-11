@@ -4,6 +4,7 @@ import {
   Column,
   ManyToOne,
   OneToMany,
+  OneToOne,
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
@@ -13,9 +14,8 @@ import { Table } from '../../tables/entities/table.entity';
 import { User } from '../../users/entities/user.entity';
 import { Customer } from '../../customers/entities/customer.entity';
 import { OrderItem } from '../../order-items/entities/order-item.entity';
-import { OrderStatus } from 'src/common/enums';
-import { OrderType } from 'src/common/enums';
 import { Payment } from '../../payments/entities/payment.entity';
+import { OrderStatus, OrderType } from 'src/common/enums';
 
 @Entity('orders')
 export class Order {
@@ -69,6 +69,10 @@ export class Order {
   @Column({ type: 'datetime', nullable: true })
   completedAt: Date;
 
+  // ✅ ONE-TO-ONE RELATIONSHIP WITH PAYMENT
+  @Column({ nullable: true })
+  paymentId: number;
+
   @ManyToOne(() => Restaurant, (restaurant) => restaurant.orders, {
     onDelete: 'CASCADE',
   })
@@ -90,8 +94,13 @@ export class Order {
   @OneToMany(() => OrderItem, (orderItem) => orderItem.order, { cascade: true })
   orderItems: OrderItem[];
 
-   @OneToMany(() => Payment, payment => payment.order)
-   payments: Payment[];
+  // ✅ ONE-TO-ONE (not OneToMany)
+  @OneToOne(() => Payment, (payment) => payment.order, {
+    cascade: true,
+    nullable: true,
+  })
+  @JoinColumn({ name: 'paymentId' })
+  payment: Payment; // SINGULAR, not payments[]
 
   @CreateDateColumn()
   createdAt: Date;

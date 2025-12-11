@@ -43,7 +43,7 @@ export class Payment {
   @Column({ type: 'datetime', nullable: true })
   paidAt: Date;
 
-  @OneToOne(() => Order, (order) => order.payments, { onDelete: 'CASCADE' })
+  @OneToOne(() => Order, (order) => order.payment, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'orderId' })
   order: Order;
 

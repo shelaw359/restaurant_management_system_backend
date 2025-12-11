@@ -1,4 +1,3 @@
-
 import {
   Controller,
   Get,
@@ -17,14 +16,17 @@ import {
   ApiBearerAuth,
   ApiQuery,
 } from '@nestjs/swagger';
-import { TableService } from './tables.service'; 
+import { TableService } from './tables.service';
 import { CreateTableDto } from './dto/create-table.dto';
 import { UpdateTableDto } from './dto/update-table.dto';
-import { UpdateTableStatusDto } from './dto/update-table-status.dto'; 
+import { UpdateTableStatusDto } from './dto/update-table-status.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole, TableStatus } from '../common/enums';
+// ADD THESE IMPORTS:
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { User } from '../users/entities/user.entity';
 
 @ApiTags('Tables')
 @Controller('tables')
@@ -36,46 +38,66 @@ export class TableController {
   @Post()
   @Roles(UserRole.ADMIN, UserRole.OWNER, UserRole.MANAGER)
   @ApiOperation({ summary: 'Create table (ADMIN/OWNER/MANAGER)' })
-  create(@Body() createTableDto: CreateTableDto) {
-    return this.tableService.create(createTableDto);
+  create(
+    @CurrentUser() user: User, // ADDED
+    @Body() createTableDto: CreateTableDto,
+  ) {
+    // Auto-inject restaurantId from JWT
+    return this.tableService.create({
+      ...createTableDto,
+      restaurantId: user.restaurantId, // AUTO from JWT
+    });
   }
 
   @Get()
   @ApiOperation({ summary: 'Get all tables for a restaurant' })
-  @ApiQuery({ name: 'restaurantId', type: Number })
-  findAll(@Query('restaurantId', ParseIntPipe) restaurantId: number) {
-    return this.tableService.findAll(restaurantId);
+  @ApiQuery({ name: 'restaurantId', type: Number, required: false }) // Made optional
+  findAll(
+    @CurrentUser() user: User, // ADDED
+    @Query('restaurantId', new ParseIntPipe({ optional: true })) restaurantId?: number,
+  ) {
+    // Auto-filter by JWT restaurantId if not provided
+    const targetRestaurantId = restaurantId || user.restaurantId;
+    return this.tableService.findAll(targetRestaurantId);
   }
 
   @Get('available')
   @ApiOperation({ summary: 'Get available tables' })
-  @ApiQuery({ name: 'restaurantId', type: Number })
-  @ApiQuery({ name: 'capacity', type: Number, required: false })
+  @ApiQuery({ name: 'capacity', type: Number, required: false }) // Optional FIRST
+  @ApiQuery({ name: 'restaurantId', type: Number, required: false }) // Optional SECOND
   findAvailable(
-    @Query('restaurantId', ParseIntPipe) restaurantId: number,
-    @Query('capacity') capacity?: number,
+    @CurrentUser() user: User, // ADDED
+    @Query('capacity') capacity?: number, // Optional FIRST
+    @Query('restaurantId', new ParseIntPipe({ optional: true })) restaurantId?: number, // Optional SECOND
   ) {
+    const targetRestaurantId = restaurantId || user.restaurantId;
     return this.tableService.findAvailableTables(
-      restaurantId,
+      targetRestaurantId,
       capacity ? parseInt(capacity.toString()) : undefined,
     );
   }
 
   @Get('status/:status')
   @ApiOperation({ summary: 'Get tables by status' })
-  @ApiQuery({ name: 'restaurantId', type: Number })
+  @ApiQuery({ name: 'restaurantId', type: Number, required: false }) // Optional
   findByStatus(
+    @CurrentUser() user: User, // ADDED
     @Param('status') status: TableStatus,
-    @Query('restaurantId', ParseIntPipe) restaurantId: number,
+    @Query('restaurantId', new ParseIntPipe({ optional: true })) restaurantId?: number,
   ) {
-    return this.tableService.findByStatus(restaurantId, status);
+    const targetRestaurantId = restaurantId || user.restaurantId;
+    return this.tableService.findByStatus(targetRestaurantId, status);
   }
 
   @Get('statistics')
   @ApiOperation({ summary: 'Get table statistics' })
-  @ApiQuery({ name: 'restaurantId', type: Number })
-  getStatistics(@Query('restaurantId', ParseIntPipe) restaurantId: number) {
-    return this.tableService.getTableStatistics(restaurantId);
+  @ApiQuery({ name: 'restaurantId', type: Number, required: false }) // Optional
+  getStatistics(
+    @CurrentUser() user: User, // ADDED
+    @Query('restaurantId', new ParseIntPipe({ optional: true })) restaurantId?: number,
+  ) {
+    const targetRestaurantId = restaurantId || user.restaurantId;
+    return this.tableService.getTableStatistics(targetRestaurantId);
   }
 
   @Get(':id')

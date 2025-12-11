@@ -18,7 +18,6 @@ export class CustomerService {
   ) {}
 
   async create(createCustomerDto: CreateCustomerDto): Promise<Customer> {
-    // Check if phone already exists
     const existing = await this.customerRepository.findOne({
       where: {
         phone: createCustomerDto.phone,
@@ -34,23 +33,32 @@ export class CustomerService {
     return await this.customerRepository.save(customer);
   }
 
-  async findOrCreate(dto: FindOrCreateCustomerDto): Promise<Customer> {
-    // Try to find existing customer by phone
+  async findOrCreate(
+    restaurantId: number,
+    data: { phone: string; name: string },
+  ): Promise<Customer> {
     let customer = await this.customerRepository.findOne({
       where: {
-        phone: dto.phone,
-        restaurantId: dto.restaurantId,
+        phone: data.phone,
+        restaurantId: restaurantId,
       },
     });
 
-    // If not found, create new customer
     if (!customer) {
-      customer = this.customerRepository.create({
-        phone: dto.phone,
-        name: dto.name || 'Guest',
-        restaurantId: dto.restaurantId,
-      });
-      await this.customerRepository.save(customer);
+      const customerData = {
+        restaurantId: restaurantId,
+        phone: data.phone,
+        name: data.name,
+        totalOrders: 0,
+        totalSpent: 0,
+        isActive: true,
+      };
+
+      const newCustomer = this.customerRepository.create(customerData);
+      customer = await this.customerRepository.save(newCustomer);
+      console.log(`✅ New customer created: ${customer.name} (${customer.phone})`);
+    } else {
+      console.log(`✅ Existing customer found: ${customer.name} (ID: ${customer.id})`);
     }
 
     return customer;
@@ -102,7 +110,6 @@ export class CustomerService {
   async update(id: number, updateCustomerDto: UpdateCustomerDto): Promise<Customer> {
     const customer = await this.findOne(id);
 
-    // Check if changing phone to existing number
     if (updateCustomerDto.phone && updateCustomerDto.phone !== customer.phone) {
       const existing = await this.customerRepository.findOne({
         where: {
@@ -120,10 +127,7 @@ export class CustomerService {
     return await this.customerRepository.save(customer);
   }
 
-  async updateStats(
-    id: number,
-    orderAmount: number,
-  ): Promise<Customer> {
+  async updateStats(id: number, orderAmount: number): Promise<Customer> {
     const customer = await this.findOne(id);
 
     customer.totalOrders += 1;
@@ -162,7 +166,7 @@ export class CustomerService {
       totalCustomers: customers.length,
       totalRevenue: customers.reduce((sum, c) => sum + Number(c.totalSpent), 0),
       averageOrderValue:
-        customers.length > 0
+        customers.length > 0 && customers.reduce((sum, c) => sum + c.totalOrders, 0) > 0
           ? customers.reduce((sum, c) => sum + Number(c.totalSpent), 0) /
             customers.reduce((sum, c) => sum + c.totalOrders, 0)
           : 0,

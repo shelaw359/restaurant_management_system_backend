@@ -48,16 +48,18 @@ export class PaymentController {
     return this.paymentService.processPayment(orderId, processDto);
   }
 
+  // ✅ FIXED: Added WAITER role
   @Get()
-  @Roles(UserRole.ADMIN, UserRole.OWNER, UserRole.MANAGER)
-  @ApiOperation({ summary: 'Get all payments (ADMIN/OWNER/MANAGER)' })
+  @Roles(UserRole.ADMIN, UserRole.OWNER, UserRole.MANAGER, UserRole.WAITER)
+  @ApiOperation({ summary: 'Get all payments (ADMIN/OWNER/MANAGER/WAITER)' })
   @ApiQuery({ name: 'restaurantId', type: Number })
   findAll(@Query('restaurantId', ParseIntPipe) restaurantId: number) {
     return this.paymentService.findAll(restaurantId);
   }
 
+  // ✅ FIXED: Added WAITER role
   @Get('status/:status')
-  @Roles(UserRole.ADMIN, UserRole.OWNER, UserRole.MANAGER)
+  @Roles(UserRole.ADMIN, UserRole.OWNER, UserRole.MANAGER, UserRole.WAITER)
   @ApiOperation({ summary: 'Get payments by status' })
   @ApiQuery({ name: 'restaurantId', type: Number })
   findByStatus(
@@ -73,8 +75,9 @@ export class PaymentController {
     return this.paymentService.findByOrder(orderId);
   }
 
+  // ✅ FIXED: Added WAITER role
   @Get('revenue/daily')
-  @Roles(UserRole.ADMIN, UserRole.OWNER, UserRole.MANAGER)
+  @Roles(UserRole.ADMIN, UserRole.OWNER, UserRole.MANAGER, UserRole.WAITER)
   @ApiOperation({ summary: 'Get daily revenue report' })
   @ApiQuery({ name: 'restaurantId', type: Number })
   @ApiQuery({ name: 'date', type: String, required: false })
@@ -86,8 +89,9 @@ export class PaymentController {
     return this.paymentService.getDailyRevenue(restaurantId, targetDate);
   }
 
+  // ✅ FIXED: Added WAITER role
   @Get('statistics')
-  @Roles(UserRole.ADMIN, UserRole.OWNER, UserRole.MANAGER)
+  @Roles(UserRole.ADMIN, UserRole.OWNER, UserRole.MANAGER, UserRole.WAITER)
   @ApiOperation({ summary: 'Get payment statistics' })
   @ApiQuery({ name: 'restaurantId', type: Number })
   @ApiQuery({ name: 'startDate', type: String })

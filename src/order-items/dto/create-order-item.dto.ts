@@ -6,7 +6,7 @@ export class CreateOrderItemDto {
   @ApiProperty({ example: 1 })
   @IsInt()
   @Type(() => Number)
-  orderId: number;
+  orderId: number;  // ← This stays for adding items to existing orders
 
   @ApiProperty({ example: 5 })
   @IsInt()

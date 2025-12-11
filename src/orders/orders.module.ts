@@ -1,21 +1,25 @@
-import { Module } from '@nestjs/common';
+// src/orders/orders.module.ts - ADD PaymentModule
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { OrderService } from './orders.service'; 
-import { OrderController } from './orders.controller';
-import { Order } from './entities/order.entity'; 
+import { OrderService } from './orders.service';
+import { OrdersController } from './orders.controller';
+import { Order } from './entities/order.entity';
 import { OrderItem } from '../order-items/entities/order-item.entity';
-import { MenuItem } from '../menu-items/entities/menu-item.entity';
 import { CustomerModule } from '../customers/customers.module';
-import { TableModule } from 'src/tables/tables.module'; 
+import { MenuModule } from '../menu-items/menu-items.module';
+import { TableModule } from '../tables/tables.module';
+import { PaymentModule } from '../payments/payments.module'; // ✅ ADD THIS
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Order, OrderItem, MenuItem]),
+    TypeOrmModule.forFeature([Order, OrderItem]),
     CustomerModule,
-    TableModule,
+    MenuModule,
+    forwardRef(() => TableModule),
+    PaymentModule, // ✅ ADD THIS
   ],
-  controllers: [OrderController],
+  controllers: [OrdersController],
   providers: [OrderService],
-  exports: [OrderService],
+  exports: [OrderService, TypeOrmModule],
 })
 export class OrderModule {}

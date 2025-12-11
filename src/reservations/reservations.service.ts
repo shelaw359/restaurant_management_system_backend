@@ -162,33 +162,69 @@ export class ReservationService {
     return await this.findOne(id);
   }
 
+  /**
+   * ✅ FIXED: Now properly handles SEATED status
+   * Table status flow:
+   * PENDING → No table status change
+   * CONFIRMED → Table = RESERVED
+   * SEATED → Table = OCCUPIED (customer is sitting)
+   * COMPLETED/CANCELLED/NO_SHOW → Table = AVAILABLE
+   */
   async updateStatus(id: number, status: ReservationStatus): Promise<Reservation> {
     const reservation = await this.findOne(id);
+    const oldStatus = reservation.status;
 
+    // Update reservation status
     reservation.status = status;
 
-    // Update table status based on reservation status
-    if (status === ReservationStatus.CONFIRMED) {
-      const table = await this.tableRepository.findOne({
-        where: { id: reservation.tableId },
-      });
-      if (table) {
-        table.status = TableStatus.RESERVED;
-        await this.tableRepository.save(table);
-      }
+    // Get the table to update its status
+    const table = await this.tableRepository.findOne({
+      where: { id: reservation.tableId },
+    });
+
+    if (!table) {
+      throw new NotFoundException(`Table #${reservation.tableId} not found`);
     }
 
-    if (status === ReservationStatus.COMPLETED || status === ReservationStatus.CANCELLED) {
-      const table = await this.tableRepository.findOne({
-        where: { id: reservation.tableId },
-      });
-      if (table && table.status === TableStatus.RESERVED) {
-        table.status = TableStatus.AVAILABLE;
+    // Handle table status updates based on reservation status changes
+    switch (status) {
+      case ReservationStatus.CONFIRMED:
+        // When confirmed, mark table as RESERVED
+        if (table.status !== TableStatus.OCCUPIED) {
+          table.status = TableStatus.RESERVED;
+          await this.tableRepository.save(table);
+        }
+        break;
+
+      case ReservationStatus.SEATED:
+        // ✅ CRITICAL: When customer is seated, mark table as OCCUPIED
+        table.status = TableStatus.OCCUPIED;
         await this.tableRepository.save(table);
-      }
+        break;
+
+      case ReservationStatus.COMPLETED:
+      case ReservationStatus.CANCELLED:
+      case ReservationStatus.NO_SHOW:
+        // When reservation ends, free the table
+        // Only free if it was previously reserved or occupied
+        if (
+          table.status === TableStatus.RESERVED || 
+          table.status === TableStatus.OCCUPIED
+        ) {
+          table.status = TableStatus.AVAILABLE;
+          await this.tableRepository.save(table);
+        }
+        break;
+
+      case ReservationStatus.PENDING:
+        // No table status change for pending
+        break;
     }
 
+    // Save reservation with new status
     await this.reservationRepository.save(reservation);
+    
+    // Return updated reservation with relations
     return await this.findOne(id);
   }
 
@@ -246,18 +282,26 @@ export class ReservationService {
     const startMinutes = hours * 60 + minutes;
     const endMinutes = startMinutes + duration * 60;
 
-    // Get all reservations for this table on this date
+    // Get all active reservations for this table on this date
+    // Include CONFIRMED and SEATED reservations in conflict check
     const existingReservations = await this.reservationRepository.find({
       where: {
         tableId,
         reservationDate: reservationDate as any,
-        status: ReservationStatus.CONFIRMED,
         isActive: true,
       },
     });
 
+    // Filter to only check relevant statuses
+    const relevantReservations = existingReservations.filter(
+      (r) => 
+        r.status === ReservationStatus.CONFIRMED || 
+        r.status === ReservationStatus.SEATED ||
+        r.status === ReservationStatus.PENDING, // Include pending too
+    );
+
     // Check for time conflicts
-    for (const existing of existingReservations) {
+    for (const existing of relevantReservations) {
       if (excludeReservationId && existing.id === excludeReservationId) {
         continue;
       }
@@ -300,6 +344,8 @@ export class ReservationService {
         .length,
       pending: filteredReservations.filter((r) => r.status === ReservationStatus.PENDING)
         .length,
+      seated: filteredReservations.filter((r) => r.status === ReservationStatus.SEATED)
+        .length, // ✅ ADDED: Include seated count in stats
       cancelled: filteredReservations.filter((r) => r.status === ReservationStatus.CANCELLED)
         .length,
       completed: filteredReservations.filter((r) => r.status === ReservationStatus.COMPLETED)

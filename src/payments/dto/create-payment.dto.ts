@@ -1,30 +1,32 @@
-import { IsInt, IsEnum, IsNumber, IsString, IsOptional, Min } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { PaymentMethod } from '../../common/enums';
+import { PaymentMethod, PaymentStatus } from '../../common/enums';
 
 export class CreatePaymentDto {
-  @ApiProperty({ example: 1 })
-  @IsInt()
-  @Type(() => Number)
+  @ApiProperty({ description: 'Order ID', example: 1 })
+  @IsNumber()
   orderId: number;
 
-  @ApiProperty({ example: 1500 })
+  @ApiProperty({ description: 'Payment amount', example: 100.00 })
   @IsNumber()
   @Min(0)
-  @Type(() => Number)
   amount: number;
 
-  @ApiProperty({ enum: PaymentMethod, example: PaymentMethod.CASH })
+  @ApiProperty({ enum: PaymentMethod, description: 'Payment method', example: PaymentMethod.CASH })
   @IsEnum(PaymentMethod)
   method: PaymentMethod;
 
-  @ApiProperty({ example: 'TXN123456789', required: false })
+  @ApiProperty({ enum: PaymentStatus, description: 'Payment status', required: false, example: PaymentStatus.PENDING })
+  @IsOptional()
+  @IsEnum(PaymentStatus)
+  status?: PaymentStatus;
+
+  @ApiProperty({ description: 'Transaction ID', required: false, example: 'TRX-123456' })
   @IsOptional()
   @IsString()
   transactionId?: string;
 
-  @ApiProperty({ example: 'Customer paid in full', required: false })
+  @ApiProperty({ description: 'Payment notes', required: false, example: 'Paid in cash' })
   @IsOptional()
   @IsString()
   notes?: string;

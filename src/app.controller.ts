@@ -9,4 +9,14 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
+
+  @Get('api/health')  // ⬅️ Add this
+  healthCheck() {
+    return {
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      service: 'Restaurant Management API',
+      uptime: process.uptime()
+    };
+  }
 }

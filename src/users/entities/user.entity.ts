@@ -12,6 +12,7 @@ import { Restaurant } from '../../restaurants/entities/restaurant.entity';
 import { UserRole } from '../../common/enums'; 
 import { Exclude } from 'class-transformer';
 import { Order } from '../../orders/entities/order.entity'; 
+// import { RefreshTokenDto } from 'src/auth/dto/refresh-token.dto'; 
 
 @Entity('users')
 export class User {
@@ -55,6 +56,8 @@ export class User {
 
   @OneToMany(() => Order, (order) => order.waiter)
   orders: Order[];
+  // @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user)
+  // refreshTokens: RefreshToken[];
 
   @CreateDateColumn()
   createdAt: Date;

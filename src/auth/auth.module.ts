@@ -11,14 +11,14 @@ import { Restaurant } from 'src/restaurants/entities/restaurant.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Restaurant]),
-    PassportModule,
+    PassportModule.register({ defaultStrategy: 'jwt' }), // ✅ FIXED: Added register()
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'your-secret-key-change-in-production',
+      secret: process.env.JWT_SECRET || 'restaurant-management-system-secret-2024-change-this', // ✅ Use same secret
       signOptions: { expiresIn: '7d' },
     }),
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
-  exports: [AuthService, JwtModule],
+  exports: [AuthService, JwtModule, PassportModule], // ✅ Added PassportModule to exports
 })
 export class AuthModule {}

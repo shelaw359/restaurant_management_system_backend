@@ -18,20 +18,23 @@ export enum OrderStatus {
   CONFIRMED = 'CONFIRMED',
   IN_PROGRESS = 'IN_PROGRESS',
   COMPLETED = 'COMPLETED',
+  SERVED = 'SERVED',
+  PAID = 'PAID', // Add this line
   CANCELLED = 'CANCELLED',
 }
 
 export enum OrderType {
   DINE_IN = 'DINE_IN',
   TAKEAWAY = 'TAKEAWAY',
-  DELIVERY = 'DELIVERY',
+  
 }
 
 export enum PaymentMethod {
   CASH = 'CASH',
   CARD = 'CARD',
-  MOBILE_MONEY = 'MOBILE_MONEY',
+  MPESA = 'MPESA',
   BANK_TRANSFER = 'BANK_TRANSFER',
+  
 }
 
 export enum PaymentStatus {
@@ -44,6 +47,7 @@ export enum PaymentStatus {
 export enum ReservationStatus {
   PENDING = 'PENDING',
   CONFIRMED = 'CONFIRMED',
+  SEATED = 'SEATED',
   CANCELLED = 'CANCELLED',
   COMPLETED = 'COMPLETED',
   NO_SHOW = 'NO_SHOW',
