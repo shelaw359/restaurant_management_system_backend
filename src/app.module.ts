@@ -14,6 +14,8 @@ import { PaymentModule } from './payments/payments.module';
 import { ReservationModule } from './reservations/reservations.module';
 import { InventoryModule } from './inventory-items/inventory-items.module';
 import { CustomerModule } from './customers/customers.module';
+import { AnalyticsModule } from './analytics/analytics.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -59,6 +61,8 @@ import { CustomerModule } from './customers/customers.module';
     ReservationModule,
     InventoryModule,
     CustomerModule,
+    AnalyticsModule,
+    NotificationsModule,
   ],
   controllers: [AppController],  // ⬅️ ADD THIS LINE
   providers: [AppService],       // ⬅️ ADD THIS LINE
