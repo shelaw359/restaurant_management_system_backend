@@ -458,3 +458,19 @@ Authorization: Bearer {{token}}
 ### 35. Get Restaurant Statistics
 GET {{host}}/restaurant/statistics
 Authorization: Bearer {{token}}
+
+
+###
+POST http://localhost:4000/notifications
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5AZ29sZGVuZHJhZ29uLmNvbSIsInJvbGUiOiJBRE1JTiIsInJlc3RhdXJhbnRJZCI6MSwiaWF0IjoxNzY1NzA3ODYyLCJleHAiOjE3NjU3MDg3NjJ9.UdKiMimBP2aUlLnS1ernQCD3IQelohNZi4kzlDLms_c
+
+{
+  "userId": 1,
+  "restaurantId": 1,
+  "type": "ORDER",
+  "priority": "HIGH",
+  "title": "Test Notification",
+  "message": "This is a test notification",
+  "actionUrl": "/orders/1"
+}
