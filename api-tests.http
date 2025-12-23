@@ -474,3 +474,46 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsI
   "message": "This is a test notification",
   "actionUrl": "/orders/1"
 }
+
+
+
+### Test M-Pesa STK Push
+POST http://localhost:4000/mpesa/stk-push
+Content-Type: application/json
+
+{
+  "phone_number": "254708374149",
+  "amount": 1,
+  "account_reference": "TEST-001",
+  "transaction_desc": "Test Payment"
+}
+
+### Check Transaction Status
+GET http://localhost:4000/mpesa/transaction-status/ws_CO_xxxxx
+
+### Test Endpoint
+GET http://localhost:4000/mpesa/test
+
+### Test Endpoint
+GET http://localhost:4000/mpesa/test
+
+###
+POST http://localhost:4000/mpesa/stk-push
+Content-Type: application/json
+
+{
+  "phone_number": "254708374149",
+  "amount": 1,
+  "account_reference": "TEST-001",
+  "transaction_desc": "Test Payment"
+}
+###
+POST http://localhost:4000/mpesa/stk-push
+Content-Type: application/json
+
+{
+  "phone_number": "254708374149",
+  "amount": 1,
+  "account_reference": "TEST-001",
+  "transaction_desc": "Test Payment"
+}

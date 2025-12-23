@@ -16,6 +16,7 @@ import { InventoryModule } from './inventory-items/inventory-items.module';
 import { CustomerModule } from './customers/customers.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { MpesaModule } from './mpesa/mpesa.module';
 
 @Module({
   imports: [
@@ -63,6 +64,8 @@ import { NotificationsModule } from './notifications/notifications.module';
     CustomerModule,
     AnalyticsModule,
     NotificationsModule,
+    MpesaModule,
+    
   ],
   controllers: [AppController],  // ⬅️ ADD THIS LINE
   providers: [AppService],       // ⬅️ ADD THIS LINE
